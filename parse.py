@@ -6,10 +6,14 @@ from bs4 import BeautifulSoup
 
 from create_json import create_json
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0'
-}
+import random
 
+headers = [
+'User-Agent : Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0',
+'User-Agent : Opera/7.54 (Windows NT 5.1; U) [en]',
+'User-Agent : Mozilla/5.0 (Windows NT 5.0; U) Opera 7.21 [en]',
+'User-Agent : Mozilla/5.0 (Windows NT 5.1; U; en; rv:1.8.0) Gecko/20060728 Firefox/1.5.0 Opera 9.24'
+]
 
 def h1_handler(header):
     parent_el = header.parent
@@ -22,17 +26,34 @@ def h1_handler(header):
     return parent_el
 
 
-def css_handler(site):
-    pass
+def css_handler(soup):
+    href_list = [] 
+    stylesheet_list = ['stylesheet'] 
+    link = soup.find_all('link')
+    for l in link:
+        if l.attrs['rel'] == stylesheet_list:
+            href_list.append(l.attrs['href'])  
 
+    for h in href_list:
+        rand_headers = random.choice(headers)
+        url_complete = 'https:' + h 
+        res_css = requests.get(url= url_complete, timeout=20)
+        if res_css.status_code != 200:
+            res_css = requests.get(url=url_complete, timeout=20 ,header = rand_headers) 
+            if res_css.status_code != 200:
+                return 1
+        print (res_css.text)
+            
 
 def parse(page, flag_log):
     try:
         # headers
         # get text site
+        rand_headers = random.choice(headers)
+
         res = requests.get(url=page, timeout=20)
         if res.status_code != 200:
-            res = requests.get(url=page, timeout=20, header=headers)
+            res = requests.get(url=page, timeout=20 ,header = rand_headers) 
             if res.status_code != 200:
                 return 1
         # start parse
@@ -47,10 +68,8 @@ def parse(page, flag_log):
         element = None
         if header is not None:
             element = h1_handler(header)
-            # for el in element:
-            #    file.write(str(el))
         else:
-            # css handler
+            css_handler(soup)
             return 1
         if element is not None and header is not None:
             json = create_json(element, page, header.text.replace('\n', ''))
@@ -68,7 +87,6 @@ def parse(page, flag_log):
 
         else:
             logging.error('Error: ' + page + ' page was not parsed')
-        # file.write(
-        #   '<br><br><br>/////////////////////////////////////////////////////////////////////////<br><br><br>')
+
     except Exception as err:
         logging.critical(page + '_Error: ', err)
