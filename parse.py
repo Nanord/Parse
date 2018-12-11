@@ -13,8 +13,9 @@ headers = {
 
 def h1_handler(header):
     parent_el = header.parent
+    print(parent_el)
     while True:
-        if len(parent_el.text) > 1000:
+        if len(parent_el.text) > 1000:  # Add factors stoping //
             break
         else:
             parent_el = parent_el.parent
@@ -56,6 +57,7 @@ def parse(page, flag_log):
             if flag_log:
                 # new File html
                 file = open('logs/text.html', 'w')
+                file.write("<head><meta charset=utf-8></head>")
                 if element is not None:
                     file.write(str(element) + '<br><br>')
                 file.close()
