@@ -1,8 +1,9 @@
-import codecs
+# -*- coding: utf-8 -*-
+
 import json
 
 
-def create_json(element, url, header):
+def create_json(element, url, header, title):
     # lists json
     lists = {}
 
@@ -23,7 +24,13 @@ def create_json(element, url, header):
     for a in element.find_all('a', href=True):
         list_a[a['href']] = {'text': a.text.replace('\n', '')}
     lists['a'] = list_a
+    # valuation
+    if header.replace(' ', '') in title.replace(' ', ''):
+        valuation = 2
+    else:
+        valuation = 1
+    lists['valuation'] = valuation
+
     # write to file
-    y = json.dumps(lists, indent=4)
-    #print(y)
+    y = json.dumps(lists, indent=4, ensure_ascii=False)
     return y
