@@ -12,10 +12,10 @@ def main(url, flag_log=False):
 
 
 def print_example_sites():
-#    print("Example url for you: ")
+    print("Example url for you: ")
     for u in url_list:
         pass
- #       print(u)
+        print(u)
 
 
 def create_parser_arg():
@@ -39,6 +39,5 @@ if __name__ == '__main__':
         else:
             main(u, False)
     else:
-        #url = str(input("Enter url: "))
-        url = 'https://vc.ru/life/51256-tilda-kak-i-skolko-mozhno-sekonomit-na-sozdanii-sayta?comment=959679'
+        url = str(input("Enter url: "))
         main(url, True)

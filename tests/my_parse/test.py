@@ -1,6 +1,10 @@
 import json
 import logging
 import random
+import sys
+
+from parse import parse
+import argparse
 
 import time
 from collections import OrderedDict
@@ -35,7 +39,7 @@ def test(generator=False):
 
             if json_site != '' and type(json_site) == str:
                 json_site = json.loads(json_site)
-               # end_time = float(json_site['time'])
+                # end_time = float(json_site['time'])
                 t = round(float(end_time), 2)
                 if t < 2:
                     if json_site != 1:
@@ -44,8 +48,6 @@ def test(generator=False):
                             # Метрика зависимости времени от кол-ва символов
                             metic_count_symbol_time[int(json_site['len_content'])] = t
                             # count_symbol_article_list.append(len(str(json_site['article'])))
-
-
 
                 # Оценка парсига
                 valuation_list.append(json_site['valuation'])
@@ -66,7 +68,8 @@ def test(generator=False):
         print(i)
         i += 1
     print(len(url_list))
-    lineplot(x_data=[i for i in range(1, len(time_list) + 1)], y_data=time_list, x_label='site(count)', y_label='time(sec)',
+    lineplot(x_data=[i for i in range(1, len(time_list) + 1)], y_data=time_list, x_label='site(count)',
+             y_label='time(sec)',
              name='time')
     lineplot2(x_data=[i for i in range(1, len(valuation_list) + 1)], y_data=valuation_list, x_label='site(count)',
               y_label='valuation', name='valuation')
@@ -94,4 +97,23 @@ def test(generator=False):
     # Метрика зависимости времени от кол-ва символов
 
 
-test()
+def create_parser_arg():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-y', type=str, help="generation urls")
+    parser.add_argument('-n', type=str, help="use only url_list.py")
+    return parser
+
+
+if __name__ == '__main__':
+    parser_arg = create_parser_arg()
+    namespace = parser_arg.parse_args(sys.argv[1:])
+    y = namespace.y
+    n = namespace.n
+
+    if y is not None:
+        if n is not None:
+            main(False)
+        else:
+            main(True)
+    else:
+        test(False)
