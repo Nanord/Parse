@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import json
+import time
 
 
-def create_json(element, url, header, title):
+def create_json(element, url, header, title, start_time, len_content):
     # lists json
     lists = {}
 
@@ -12,7 +13,7 @@ def create_json(element, url, header, title):
     # header
     lists['header'] = header.replace('  ', ' ')
     # article
-    lists['article'] = str(element.text).replace('\n\n', '')
+    lists['article'] = str(element.text)#.replace('\n\n', '\n')
     # img
     list_img = {}
     for img in element.find_all('img', src=True):
@@ -31,6 +32,9 @@ def create_json(element, url, header, title):
         valuation = 1
     lists['valuation'] = valuation
 
+    lists['time'] = time.time() - start_time
+
+    lists['len_content'] = len_content
     # write to file
     y = json.dumps(lists, indent=4, ensure_ascii=False)
     return y

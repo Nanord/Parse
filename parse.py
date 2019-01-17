@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import codecs
 import logging
+import time
+
 import requests
 from bs4 import BeautifulSoup
 from create_json import create_json
@@ -9,14 +11,7 @@ from yaml import dump
 
 from css_header import css_handler
 from h1_header import h1_handler
-
-headers = [
-    'User-Agent : Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0',
-    'User-Agent : Opera/7.54 (Windows NT 5.1; U) [en]',
-    'User-Agent : Mozilla/5.0 (Windows NT 5.0; U) Opera 7.21 [en]',
-    'User-Agent : Mozilla/5.0 (Windows NT 5.1; U; en; rv:1.8.0) Gecko/20060728 Firefox/1.5.0 Opera 9.24'
-]
-
+from url_list import headers
 
 def parse(page, flag_log):
     try:
@@ -29,6 +24,9 @@ def parse(page, flag_log):
             res = requests.get(url=page, timeout=20, header=rand_headers)
             if res.status_code != 200:
                 return 1
+        len_content = len(res.content)
+        # START TIME
+        start_time = time.time()
         # start parse
         soup = BeautifulSoup(res.text, 'html.parser')
         # extract this <script> and <style> tags
@@ -48,7 +46,7 @@ def parse(page, flag_log):
             css_handler(soup)
             return 1
         if element is not None and header is not None:
-            json = create_json(element, page, header.text.replace('\n', ''), title.text)
+            json = create_json(element, page, header.text.replace('\n', ''), title.text, start_time, len_content)
             if flag_log:
                 # new File html
                 file = open('logs/text.html', 'w')
@@ -60,10 +58,12 @@ def parse(page, flag_log):
                                    'w', encoding="utf-8")
                 file.write(str(json))
                 file.close()
+            end_tine = time.time() - start_time
             return json
 
         else:
             logging.error('Error: ' + page + ' page was not parsed')
 
     except Exception as err:
-        logging.critical(page + '_Error: ', err)
+        pass
+        #logging.critical(page + '_Error: ', err)
